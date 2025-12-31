@@ -30,15 +30,6 @@ resource "aws_security_group_rule" "web-rule" {
 }
 
 
-resource "aws_security_group_rule" "website-rule" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.auto_deploy_security_group.id
-}
-
 
 resource "aws_security_group_rule" "outbound" {
   type              = "egress"
