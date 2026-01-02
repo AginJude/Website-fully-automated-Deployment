@@ -27,7 +27,7 @@ jobs:
       run: |
         cd packer
         packer init .
-        packer build web-ami.pkr.hcl
+        packer build ami.pkr.hcl
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
