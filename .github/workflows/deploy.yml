@@ -3,7 +3,7 @@ name: CI-CD Packer to Terraform EC2
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
