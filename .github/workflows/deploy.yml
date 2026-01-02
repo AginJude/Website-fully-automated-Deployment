@@ -1,4 +1,4 @@
-name: CI-CD Packer to Terraform EC2
+name: Packer + Terraform Automation
 
 on:
   push:
@@ -6,40 +6,35 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: eu-west-3
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Install Packer
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y packer
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Terraform
-        run: |
-          sudo apt-get install -y terraform
+    - name: Setup Packer
+      uses: hashicorp/setup-packer@v3
 
-      - name: Packer Init
-        working-directory: packer
-        run: packer init .
+    - name: Build AMI
+      run: |
+        cd terraform-infrastructure/packer
+        packer init .
+        packer build web-ami.pkr.hcl
 
-      - name: Build AMI using Packer
-        working-directory: packer
-        run: packer build ami.pkr.hcl
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init
-
-      - name: Terraform Apply (Create EC2)
-        working-directory: terraform
-        run: terraform apply -auto-approve
+    - name: Terraform Apply
+      run: |
+        cd terraform-infrastructure
+        terraform init
+        terraform apply -auto-approve
 
