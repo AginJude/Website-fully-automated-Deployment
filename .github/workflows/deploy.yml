@@ -25,7 +25,7 @@ jobs:
 
     - name: Build AMI
       run: |
-        cd terraform-infrastructure/packer
+        cd packer
         packer init .
         packer build web-ami.pkr.hcl
 
