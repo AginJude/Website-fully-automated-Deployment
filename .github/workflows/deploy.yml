@@ -18,28 +18,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Packer
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y packer
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@v3
 
-      - name: Install Terraform
-        run: |
-          sudo apt-get install -y terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Packer Init
         working-directory: packer
         run: packer init .
 
-      - name: Build AMI using Packer
+      - name: Build AMI
         working-directory: packer
         run: packer build ami.pkr.hcl
 
       - name: Terraform Init
-        working-directory: terraform
+        working-directory: terraform-infrastructure
         run: terraform init
 
       - name: Terraform Apply (Create EC2)
-        working-directory: terraform
+        working-directory: terraform-infrastructure
         run: terraform apply -auto-approve
 
